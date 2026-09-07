@@ -8,18 +8,16 @@
         body {
             background-color: black;
             margin: 0;
-            overflow: hidden; /* Tetap tanpa scrollbar */
             display: flex;
-            flex-direction: column; /* Menyusun elemen dari atas ke bawah */
-            justify-content: center;
+            flex-direction: column; 
             align-items: center;
-            height: 100vh;
-            gap: 10px; /* Jarak antara gambar atas dan bawah */
+            gap: 100px; /* Jarak antar gambar */
+            padding: 20px 0; /* Sedikit ruang di paling atas dan bawah web */
         }
 
         img {
-            max-width: 100vw;
-            max-height: 48vh; /* Dibagi agar kedua gambar muat di 1 layar */
+            max-width: 100%;
+            height: 100vh; /* Setiap gambar full setinggi layar */
             object-fit: contain; 
         }
     </style>
