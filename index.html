@@ -8,11 +8,11 @@
         body {
             background-color: black;
             margin: 0;
+            padding: 0; /* Hapus padding agar nempel ke atas dan bawah layar */
             display: flex;
             flex-direction: column; 
             align-items: center;
-            gap: 100px; /* Jarak antar gambar */
-            /* Padding atas-bawah dihapus agar gambar nempel ke tepi */
+            gap: 100px; 
         }
 
         img {
@@ -21,76 +21,92 @@
             object-fit: contain; 
         }
 
-        /* Styling Floating Button */
-        #floatBtn {
+        /* Floating Button Abu-abu Transparan */
+        #fab {
             position: fixed;
-            bottom: 20px;
-            left: 20px;
-            padding: 12px 20px;
-            background-color: #ffcc00;
-            color: black;
-            font-weight: bold;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background-color: rgba(128, 128, 128, 0.5); 
+            color: white;
             border: none;
-            border-radius: 8px;
+            border-radius: 50%;
+            font-size: 24px;
             cursor: pointer;
-            z-index: 9999;
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             user-select: none;
-            box-shadow: 0 4px 10px rgba(255,255,255,0.2);
+            transition: opacity 0.3s ease;
         }
     </style>
 </head>
 <body>
-    <img src="hvm2.png" alt="Bagian Atas">
+    <img id="firstImg" src="hvm2.png" alt="Bagian Atas">
     <img src="hvm.png" alt="6 Langkah Glow Up Realistis">
-    <!-- Gambar terakhir ditambahkan ID untuk target scroll -->
-    <img src="transisitobesigma.png" alt="Transisi Sigma" id="gambarTerakhir">
+    <img id="lastImg" src="transisitobesigma.png" alt="Transisi to Sigma">
 
-    <button id="floatBtn">Scroll ke Sigma ⬇️</button>
+    <button id="fab">↓</button>
 
     <script>
-        const btn = document.getElementById('floatBtn');
-        const targetImg = document.getElementById('gambarTerakhir');
+        const fab = document.getElementById('fab');
+        const firstImg = document.getElementById('firstImg');
+        const lastImg = document.getElementById('lastImg');
 
-        // 1. Fitur Scroll ke bawah saat klik kiri
-        btn.addEventListener('click', (e) => {
-            // Pastikan bukan klik kanan
-            if(e.button === 0) { 
-                targetImg.scrollIntoView({ behavior: 'smooth' });
-            }
+        // 1. Klik kiri untuk auto scroll ke gambar terakhir
+        fab.addEventListener('click', () => {
+            lastImg.scrollIntoView({ behavior: 'smooth' });
         });
 
-        // 2. Fitur Drag & Drop dengan Klik Kanan Tahan
+        // 2. Tampilkan FAB hanya saat gambar pertama (hvm2.png) terlihat di layar
+        const observer = new IntersectionObserver((entries) => {
+            if (entries[0].isIntersecting) {
+                fab.style.opacity = '1';
+                fab.style.pointerEvents = 'auto'; // Tombol bisa diklik
+            } else {
+                fab.style.opacity = '0';
+                fab.style.pointerEvents = 'none'; // Tombol nonaktif saat hilang
+            }
+        }, { threshold: 0.1 }); 
+        
+        observer.observe(firstImg);
+
+        // 3. Fitur Drag and Drop dengan Klik Kanan
         let isDragging = false;
         let offsetX, offsetY;
 
-        btn.addEventListener('mousedown', (e) => {
-            if (e.button === 2) { // 2 adalah kode untuk klik kanan
+        fab.addEventListener('mousedown', (e) => {
+            if (e.button === 2) { // e.button === 2 adalah klik kanan
                 isDragging = true;
-                offsetX = e.clientX - btn.getBoundingClientRect().left;
-                offsetY = e.clientY - btn.getBoundingClientRect().top;
-                btn.style.cursor = 'grabbing';
+                const rect = fab.getBoundingClientRect();
+                offsetX = e.clientX - rect.left;
+                offsetY = e.clientY - rect.top;
+                fab.style.cursor = 'grabbing';
             }
         });
 
         document.addEventListener('mousemove', (e) => {
             if (isDragging) {
-                // Hapus properti bottom/left bawaan agar posisinya mengikuti mouse (top/left)
-                btn.style.bottom = 'auto'; 
-                btn.style.right = 'auto';
-                btn.style.left = (e.clientX - offsetX) + 'px';
-                btn.style.top = (e.clientY - offsetY) + 'px';
+                // Hapus posisi fixed right dan bottom bawaan CSS agar bebas bergerak
+                fab.style.bottom = 'auto';
+                fab.style.right = 'auto';
+                
+                fab.style.left = (e.clientX - offsetX) + 'px';
+                fab.style.top = (e.clientY - offsetY) + 'px';
             }
         });
 
         document.addEventListener('mouseup', (e) => {
-            if (e.button === 2) {
+            if (e.button === 2 && isDragging) {
                 isDragging = false;
-                btn.style.cursor = 'pointer';
+                fab.style.cursor = 'pointer';
             }
         });
 
-        // Mencegah munculnya menu klik kanan (context menu) pada tombol ini
-        btn.addEventListener('contextmenu', (e) => {
+        // 4. Cegah menu default klik kanan muncul di tombol
+        fab.addEventListener('contextmenu', (e) => {
             e.preventDefault();
         });
     </script>
